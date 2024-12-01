@@ -44,10 +44,10 @@
     const highScoreEl = document.getElementById('high-score');
 
     const boxSize = 20;
-    let speed = 150; // Начальная скорость
-    const minSpeed = 50; // Минимальная скорость
+    let speed = 150; // Initial speed
+    const minSpeed = 50; // Minimum speed
     let score = 0;
-    let level = 1; // Уровень
+    let level = 1; // Starting level
     let highScore = localStorage.getItem('highScore') || 0;
     highScoreEl.textContent = highScore;
 
@@ -55,28 +55,28 @@
     let direction = 'RIGHT';
     let food = generateFood();
 
-    // Массив карт с разными конфигурациями препятствий
+    // Array of maps with different obstacle configurations
     const maps = [
-      { obstacles: [] }, // Простой уровень
-      { obstacles: [{ x: 100, y: 100 }, { x: 200, y: 200 }] }, // Средний уровень
-      { obstacles: [{ x: 50, y: 50 }, { x: 150, y: 150 }, { x: 300, y: 300 }] } // Сложный уровень
+      { obstacles: [] }, // Easy level
+      { obstacles: [{ x: 100, y: 100 }, { x: 200, y: 200 }] }, // Medium level
+      { obstacles: [{ x: 50, y: 50 }, { x: 150, y: 150 }, { x: 300, y: 300 }] } // Hard level
     ];
-    let currentMap = 0; // Начинаем с первого уровня
+    let currentMap = 0; // Starting map
 
     function drawGame() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Рисуем змейку
+      // Draw the snake
       snake.forEach((segment, index) => {
-        ctx.fillStyle = index === 0 ? '#0f0' : '#00f'; // Голова зелёная, тело синее
+        ctx.fillStyle = index === 0 ? '#0f0' : '#00f'; // Head is green, body is blue
         ctx.fillRect(segment.x, segment.y, boxSize, boxSize);
       });
 
-      // Рисуем еду
+      // Draw the food
       ctx.fillStyle = 'red';
       ctx.fillRect(food.x, food.y, boxSize, boxSize);
 
-      // Рисуем препятствия
+      // Draw obstacles
       ctx.fillStyle = 'gray';
       maps[currentMap].obstacles.forEach(obstacle => {
         ctx.fillRect(obstacle.x, obstacle.y, boxSize, boxSize);
@@ -84,7 +84,7 @@
 
       moveSnake();
       checkCollisions();
-      requestAnimationFrame(drawGame); // Плавное обновление
+      setTimeout(drawGame, speed); // Smooth refresh rate
     }
 
     function moveSnake() {
@@ -95,7 +95,7 @@
       if (direction === 'LEFT') head.x -= boxSize;
       if (direction === 'RIGHT') head.x += boxSize;
 
-      // Проверка, если голова выходит за границы и телепортируем её на противоположную сторону
+      // Wrap around if the head goes outside the boundaries
       if (head.x < 0) head.x = canvas.width - boxSize;
       if (head.x >= canvas.width) head.x = 0;
       if (head.y < 0) head.y = canvas.height - boxSize;
@@ -107,12 +107,10 @@
         score += 10;
         currentScoreEl.textContent = score;
 
-        // Проверка перехода на следующий уровень
+        // Level up logic
         if (score >= level * 50) {
           level++;
-          speed = Math.max(minSpeed, speed - 10); // Плавное уменьшение скорости
-          clearInterval(gameInterval);
-          gameInterval = setInterval(drawGame, speed);
+          speed = Math.max(minSpeed, speed - 10); // Gradually reduce speed but not below minSpeed
         }
 
         food = generateFood();
@@ -124,14 +122,14 @@
     function checkCollisions() {
       const head = snake[0];
 
-      // Проверка столкновения с самим собой
+      // Check for self-collision
       for (let i = 1; i < snake.length; i++) {
         if (head.x === snake[i].x && head.y === snake[i].y) {
           gameOver();
         }
       }
 
-      // Проверка столкновения с препятствиями
+      // Check for collision with obstacles
       for (let obstacle of maps[currentMap].obstacles) {
         if (head.x === obstacle.x && head.y === obstacle.y) {
           gameOver();
@@ -149,12 +147,10 @@
       score = 0;
       currentScoreEl.textContent = score;
       level = 1;
-      speed = 150; // Сброс скорости
+      speed = 150; // Reset speed
       snake = [{ x: 200, y: 200 }];
       direction = 'RIGHT';
       food = generateFood();
-      clearInterval(gameInterval);
-      gameInterval = setInterval(drawGame, speed);
     }
 
     function generateFood() {
@@ -171,7 +167,8 @@
       if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
     });
 
-    let gameInterval = setInterval(drawGame, speed);
+    // Start the game loop
+    drawGame();
   </script>
 </body>
 </html>
