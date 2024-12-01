@@ -98,22 +98,29 @@
       }
     }
 
-    // Проверка на столкновения
-    function checkCollisions() {
-      const head = snake[0];
+   // Проверка столкновений (обновлено)
+function checkCollisions() {
+  const head = snake[0];
 
-      // Столкновение с границами
-      if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
-        gameOver();
-      }
+  // Телепортация змейки через противоположные границы
+  if (head.x < 0) {
+    head.x = canvas.width - boxSize;
+  } else if (head.x >= canvas.width) {
+    head.x = 0;
+  }
+  if (head.y < 0) {
+    head.y = canvas.height - boxSize;
+  } else if (head.y >= canvas.height) {
+    head.y = 0;
+  }
 
-      // Столкновение с собой
-      for (let i = 1; i < snake.length; i++) {
-        if (head.x === snake[i].x && head.y === snake[i].y) {
-          gameOver();
-        }
-      }
+  // Столкновение с собой
+  for (let i = 1; i < snake.length; i++) {
+    if (head.x === snake[i].x && head.y === snake[i].y) {
+      gameOver();
     }
+  }
+}
 
     // Конец игры
     function gameOver() {
