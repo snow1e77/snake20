@@ -169,4 +169,44 @@
     function generateFood() {
       let foodPosition;
       do {
- 
+        foodPosition = {
+          x: Math.floor((Math.random() * canvas.width) / boxSize) * boxSize,
+          y: Math.floor((Math.random() * canvas.height) / boxSize) * boxSize,
+        };
+      } while (isFoodOnSnake(foodPosition));
+
+      return foodPosition;
+    }
+
+    function isFoodOnSnake(position) {
+      return snake.some(segment => segment.x === position.x && segment.y === position.y);
+    }
+
+    function changeDirection(newDirection) {
+      if (newDirection === 'UP' && direction !== 'DOWN') direction = 'UP';
+      if (newDirection === 'DOWN' && direction !== 'UP') direction = 'DOWN';
+      if (newDirection === 'LEFT' && direction !== 'RIGHT') direction = 'LEFT';
+      if (newDirection === 'RIGHT' && direction !== 'LEFT') direction = 'RIGHT';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
+      if (e.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+      if (e.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
+      if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+    });
+
+    pauseResumeBtn.addEventListener('click', () => {
+      if (isPaused) {
+        isPaused = false;
+        drawGame();
+      } else {
+        isPaused = true;
+        clearTimeout(gameInterval);
+      }
+    });
+
+    drawGame();
+  </script>
+</body>
+</html>
