@@ -18,6 +18,8 @@
     }
     canvas {
       border: 2px solid white;
+      max-width: 100%;
+      height: auto;
     }
     .score-board {
       text-align: center;
@@ -39,7 +41,7 @@
     <div>Score: <span id="current-score">0</span></div>
     <div>High Score: <span id="high-score">0</span></div>
   </div>
-  <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <canvas id="gameCanvas"></canvas>
   <div class="controls">
     <button id="pause-resume-btn">Pause</button>
     <button id="restart-btn">Restart</button>
@@ -74,6 +76,15 @@
       { obstacles: [{ x: 50, y: 50 }, { x: 150, y: 150 }, { x: 300, y: 300 }] } // Hard level
     ];
     let currentMap = 0; // Starting map
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth < 400 ? 400 : window.innerWidth * 0.8;
+      canvas.height = window.innerHeight < 400 ? 400 : window.innerHeight * 0.8;
+      drawGame();
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas(); // Initial call
 
     function drawGame() {
       if (isPaused) return; // Stop drawing when the game is paused
