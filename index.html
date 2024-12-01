@@ -19,6 +19,7 @@
     canvas {
       border: 2px solid white;
       touch-action: none;
+      margin-bottom: 10px;
     }
     .score-board {
       text-align: center;
@@ -30,7 +31,7 @@
       width: 100%;
       margin-top: 10px;
     }
-    .pause-btn {
+    .pause-btn, .new-game-btn {
       margin: 10px;
       padding: 10px 20px;
       font-size: 16px;
@@ -40,8 +41,28 @@
       border: none;
       border-radius: 5px;
     }
-    .pause-btn:hover {
+    .pause-btn:hover, .new-game-btn:hover {
       background-color: #d32f2f;
+    }
+    .joystick {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 100px;
+      height: 100px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .joystick .stick {
+      width: 40px;
+      height: 40px;
+      background-color: #0f0;
+      border-radius: 50%;
+      position: relative;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -53,6 +74,10 @@
   <canvas id="gameCanvas"></canvas>
   <div class="controls">
     <button class="pause-btn" id="pause-resume-btn">Pause</button>
+    <button class="new-game-btn" id="new-game-btn">New Game</button>
+  </div>
+  <div class="joystick" id="joystick">
+    <div class="stick" id="joystick-stick"></div>
   </div>
 
   <script>
@@ -61,6 +86,9 @@
     const currentScoreEl = document.getElementById('current-score');
     const highScoreEl = document.getElementById('high-score');
     const pauseResumeBtn = document.getElementById('pause-resume-btn');
+    const newGameBtn = document.getElementById('new-game-btn');
+    const joystick = document.getElementById('joystick');
+    const joystickStick = document.getElementById('joystick-stick');
 
     const boxSize = 20;
     let speed = 150;
@@ -194,30 +222,53 @@
       if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
     });
 
-    // Adding touch controls for mobile
-    canvas.addEventListener('touchstart', (e) => {
+    // Joystick functionality
+    let joystickActive = false;
+    let joystickCenter = { x: 0, y: 0 };
+
+    joystick.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      joystickActive = true;
       const touch = e.touches[0];
-      const x = touch.clientX;
-      const y = touch.clientY;
-      handleTouchInput(x, y);
+      joystickCenter = {
+        x: touch.clientX - joystick.offsetLeft,
+        y: touch.clientY - joystick.offsetTop,
+      };
     });
 
-    function handleTouchInput(x, y) {
-      const midX = canvas.width / 2;
-      const midY = canvas.height / 2;
+    joystick.addEventListener('touchmove', (e) => {
+      if (!joystickActive) return;
+      const touch = e.touches[0];
+      const dx = touch.clientX - joystickCenter.x;
+      const dy = touch.clientY - joystickCenter.y;
 
-      if (y < midY) {
-        if (direction !== 'DOWN') direction = 'UP';
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 0 && direction !== 'LEFT') direction = 'RIGHT';
+        if (dx < 0 && direction !== 'RIGHT') direction = 'LEFT';
       } else {
-        if (direction !== 'UP') direction = 'DOWN';
-      }
+        if (dy > 0 && direction !== 'UP') direction = 'DOWN';
+        if (dyПродолжение кода для джойстика и новой игры:
 
-      if (x < midX) {
-        if (direction !== 'RIGHT') direction = 'LEFT';
-      } else {
-        if (direction !== 'LEFT') direction = 'RIGHT';
+```javascript
+        if (dy < 0 && direction !== 'DOWN') direction = 'UP';
       }
-    }
+    });
+
+    joystick.addEventListener('touchend', () => {
+      joystickActive = false;
+    });
+
+    newGameBtn.addEventListener('click', () => {
+      score = 0;
+      currentScoreEl.textContent = score;
+      level = 1;
+      speed = 150;
+      snake = [{ x: 200, y: 200 }];
+      direction = 'RIGHT';
+      food = generateFood();
+      clearTimeout(gameInterval);
+      drawGame();
+    });
 
     pauseResumeBtn.addEventListener('click', () => {
       if (isPaused) {
