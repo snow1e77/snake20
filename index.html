@@ -46,6 +46,7 @@
     const boxSize = 20;
     let speed = 100;
     let score = 0;
+    let level = 1; // Новый уровень
     let highScore = localStorage.getItem('highScore') || 0;
     highScoreEl.textContent = highScore;
 
@@ -53,9 +54,16 @@
     let direction = 'RIGHT';
     let food = generateFood();
 
+    // Массив карт с разными конфигурациями препятствий
+    const maps = [
+      { obstacles: [] }, // Простой уровень
+      { obstacles: [{ x: 100, y: 100 }, { x: 200, y: 200 }] }, // Средний уровень
+      { obstacles: [{ x: 50, y: 50 }, { x: 150, y: 150 }, { x: 300, y: 300 }] } // Сложный уровень
+    ];
+    let currentMap = 0; // Начинаем с первого уровня
+
     function drawGame() {
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Рисуем змейку
       snake.forEach((segment, index) => {
@@ -67,8 +75,15 @@
       ctx.fillStyle = 'red';
       ctx.fillRect(food.x, food.y, boxSize, boxSize);
 
+      // Рисуем препятствия
+      ctx.fillStyle = 'gray';
+      maps[currentMap].obstacles.forEach(obstacle => {
+        ctx.fillRect(obstacle.x, obstacle.y, boxSize, boxSize);
+      });
+
       moveSnake();
       checkCollisions();
+      requestAnimationFrame(drawGame); // Плавное обновление
     }
 
     function moveSnake() {
@@ -90,10 +105,16 @@
       if (head.x === food.x && head.y === food.y) {
         score += 10;
         currentScoreEl.textContent = score;
+
+        // Проверка перехода на следующий уровень
+        if (score >= level * 50) {
+          level++;
+          speed = Math.max(50, speed - 10); // Увеличиваем скорость игры
+          clearInterval(gameInterval);
+          gameInterval = setInterval(drawGame, speed);
+        }
+
         food = generateFood();
-        speed = Math.max(50, speed - 5); // Увеличиваем скорость при поедании еды
-        clearInterval(gameInterval);
-        gameInterval = setInterval(drawGame, speed);
       } else {
         snake.pop();
       }
@@ -102,9 +123,16 @@
     function checkCollisions() {
       const head = snake[0];
 
-      // Проверка на столкновение с самим собой
+      // Проверка столкновения с самим собой
       for (let i = 1; i < snake.length; i++) {
         if (head.x === snake[i].x && head.y === snake[i].y) {
+          gameOver();
+        }
+      }
+
+      // Проверка столкновения с препятствиями
+      for (let obstacle of maps[currentMap].obstacles) {
+        if (head.x === obstacle.x && head.y === obstacle.y) {
           gameOver();
         }
       }
@@ -119,6 +147,7 @@
       }
       score = 0;
       currentScoreEl.textContent = score;
+      level = 1;
       speed = 100;
       snake = [{ x: 200, y: 200 }];
       direction = 'RIGHT';
