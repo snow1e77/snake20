@@ -19,7 +19,6 @@
     canvas {
       border: 2px solid white;
       touch-action: none;
-      margin-bottom: 10px;
     }
     .score-board {
       text-align: center;
@@ -30,9 +29,10 @@
       justify-content: center;
       width: 100%;
       margin-top: 10px;
+      flex-wrap: wrap;
     }
-    .pause-btn, .new-game-btn {
-      margin: 10px;
+    .button {
+      margin: 5px;
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
@@ -41,28 +41,27 @@
       border: none;
       border-radius: 5px;
     }
-    .pause-btn:hover, .new-game-btn:hover {
+    .button:hover {
       background-color: #d32f2f;
     }
     .joystick {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      width: 100px;
-      height: 100px;
-      background-color: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
+      margin-top: 10px;
     }
-    .joystick .stick {
-      width: 40px;
-      height: 40px;
-      background-color: #0f0;
+    .joystick button {
+      width: 50px;
+      height: 50px;
+      background-color: #555;
+      border: none;
       border-radius: 50%;
-      position: relative;
-      cursor: pointer;
+      color: white;
+      font-size: 20px;
+      margin: 5px;
+    }
+    .joystick button:hover {
+      background-color: #777;
     }
   </style>
 </head>
@@ -73,11 +72,16 @@
   </div>
   <canvas id="gameCanvas"></canvas>
   <div class="controls">
-    <button class="pause-btn" id="pause-resume-btn">Pause</button>
-    <button class="new-game-btn" id="new-game-btn">New Game</button>
+    <button class="button" id="pause-resume-btn">Pause</button>
+    <button class="button" id="new-game-btn">New Game</button>
   </div>
-  <div class="joystick" id="joystick">
-    <div class="stick" id="joystick-stick"></div>
+  <div class="joystick">
+    <button id="up-btn">↑</button>
+    <div>
+      <button id="left-btn">←</button>
+      <button id="right-btn">→</button>
+    </div>
+    <button id="down-btn">↓</button>
   </div>
 
   <script>
@@ -87,8 +91,6 @@
     const highScoreEl = document.getElementById('high-score');
     const pauseResumeBtn = document.getElementById('pause-resume-btn');
     const newGameBtn = document.getElementById('new-game-btn');
-    const joystick = document.getElementById('joystick');
-    const joystickStick = document.getElementById('joystick-stick');
 
     const boxSize = 20;
     let speed = 150;
@@ -215,48 +217,11 @@
       if (newDirection === 'RIGHT' && direction !== 'LEFT') direction = 'RIGHT';
     }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
-      if (e.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
-      if (e.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
-      if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
-    });
-
-    // Joystick functionality
-    let joystickActive = false;
-    let joystickCenter = { x: 0, y: 0 };
-
-    joystick.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      joystickActive = true;
-      const touch = e.touches[0];
-      joystickCenter = {
-        x: touch.clientX - joystick.offsetLeft,
-        y: touch.clientY - joystick.offsetTop,
-      };
-    });
-
-    joystick.addEventListener('touchmove', (e) => {
-      if (!joystickActive) return;
-      const touch = e.touches[0];
-      const dx = touch.clientX - joystickCenter.x;
-      const dy = touch.clientY - joystickCenter.y;
-
-      if (Math.abs(dx) > Math.abs(dy)) {
-        if (dx > 0 && direction !== 'LEFT') direction = 'RIGHT';
-        if (dx < 0 && direction !== 'RIGHT') direction = 'LEFT';
-      } else {
-        if (dy > 0 && direction !== 'UP') direction = 'DOWN';
-        if (dyПродолжение кода для джойстика и новой игры:
-
-```javascript
-        if (dy < 0 && direction !== 'DOWN') direction = 'UP';
-      }
-    });
-
-    joystick.addEventListener('touchend', () => {
-      joystickActive = false;
-    });
+    // Add joystick controls
+    document.getElementById('up-btn').addEventListener('click', () => changeDirection('UP'));
+    document.getElementById('down-btn').addEventListener('click', () => changeDirection('DOWN'));
+    document.getElementById('left-btn').addEventListener('click', () => changeDirection('LEFT'));
+    document.getElementById('right-btn').addEventListener('click', () => changeDirection('RIGHT'));
 
     newGameBtn.addEventListener('click', () => {
       score = 0;
