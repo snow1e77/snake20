@@ -34,6 +34,15 @@
       font-size: 16px;
       cursor: pointer;
     }
+    .arrow-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .arrow-controls button {
+      width: 60px;
+      height: 60px;
+    }
   </style>
 </head>
 <body>
@@ -46,6 +55,12 @@
     <button id="pause-resume-btn">Pause</button>
     <button id="restart-btn">Restart</button>
   </div>
+  <div class="arrow-controls">
+    <button id="up-btn">Up</button>
+    <button id="left-btn">Left</button>
+    <button id="down-btn">Down</button>
+    <button id="right-btn">Right</button>
+  </div>
 
   <script>
     const canvas = document.getElementById('gameCanvas');
@@ -55,7 +70,7 @@
     const pauseResumeBtn = document.getElementById('pause-resume-btn');
     const restartBtn = document.getElementById('restart-btn');
 
-    const boxSize = 20;
+    let boxSize;
     let speed = 150; // Initial speed
     const minSpeed = 50; // Minimum speed
     let score = 0;
@@ -78,8 +93,10 @@
     let currentMap = 0; // Starting map
 
     function resizeCanvas() {
-      canvas.width = window.innerWidth < 400 ? 400 : window.innerWidth * 0.8;
-      canvas.height = window.innerHeight < 400 ? 400 : window.innerHeight * 0.8;
+      const canvasSize = Math.min(window.innerWidth, window.innerHeight) * 0.8;
+      canvas.width = canvasSize;
+      canvas.height = canvasSize;
+      boxSize = Math.floor(canvasSize / 20); // Adjust box size based on canvas size
       drawGame();
     }
 
@@ -206,6 +223,20 @@
     restartBtn.addEventListener('click', () => {
       gameOver();
       drawGame(); // Start a new game
+    });
+
+    // Add event listeners for arrow buttons
+    document.getElementById('up-btn').addEventListener('click', () => {
+      if (direction !== 'DOWN') direction = 'UP';
+    });
+    document.getElementById('down-btn').addEventListener('click', () => {
+      if (direction !== 'UP') direction = 'DOWN';
+    });
+    document.getElementById('left-btn').addEventListener('click', () => {
+      if (direction !== 'RIGHT') direction = 'LEFT';
+    });
+    document.getElementById('right-btn').addEventListener('click', () => {
+      if (direction !== 'LEFT') direction = 'RIGHT';
     });
 
     // Start the game loop
