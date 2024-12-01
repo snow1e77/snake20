@@ -34,15 +34,6 @@
       font-size: 16px;
       cursor: pointer;
     }
-    .arrow-controls {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .arrow-controls button {
-      width: 60px;
-      height: 60px;
-    }
   </style>
 </head>
 <body>
@@ -55,12 +46,6 @@
     <button id="pause-resume-btn">Pause</button>
     <button id="restart-btn">Restart</button>
   </div>
-  <div class="arrow-controls">
-    <button id="up-btn">Up</button>
-    <button id="left-btn">Left</button>
-    <button id="down-btn">Down</button>
-    <button id="right-btn">Right</button>
-  </div>
 
   <script>
     const canvas = document.getElementById('gameCanvas');
@@ -70,54 +55,48 @@
     const pauseResumeBtn = document.getElementById('pause-resume-btn');
     const restartBtn = document.getElementById('restart-btn');
 
-    let boxSize;
-    let speed = 150; // Initial speed
-    const minSpeed = 50; // Minimum speed
+    const boxSize = 20;
+    let speed = 150;
+    const minSpeed = 50;
     let score = 0;
-    let level = 1; // Starting level
+    let level = 1;
     let highScore = localStorage.getItem('highScore') || 0;
     highScoreEl.textContent = highScore;
 
     let snake = [{ x: 200, y: 200 }];
     let direction = 'RIGHT';
     let food = generateFood();
-    let isPaused = false; // Flag to check if the game is paused
+    let isPaused = false;
     let gameInterval;
 
-    // Array of maps with different obstacle configurations
     const maps = [
-      { obstacles: [] }, // Easy level
-      { obstacles: [{ x: 100, y: 100 }, { x: 200, y: 200 }] }, // Medium level
-      { obstacles: [{ x: 50, y: 50 }, { x: 150, y: 150 }, { x: 300, y: 300 }] } // Hard level
+      { obstacles: [] },
+      { obstacles: [{ x: 100, y: 100 }, { x: 200, y: 200 }] },
+      { obstacles: [{ x: 50, y: 50 }, { x: 150, y: 150 }, { x: 300, y: 300 }] }
     ];
-    let currentMap = 0; // Starting map
+    let currentMap = 0;
 
     function resizeCanvas() {
-      const canvasSize = Math.min(window.innerWidth, window.innerHeight) * 0.8;
-      canvas.width = canvasSize;
-      canvas.height = canvasSize;
-      boxSize = Math.floor(canvasSize / 20); // Adjust box size based on canvas size
+      canvas.width = window.innerWidth < 400 ? 400 : window.innerWidth * 0.8;
+      canvas.height = window.innerHeight < 400 ? 400 : window.innerHeight * 0.8;
       drawGame();
     }
 
     window.addEventListener('resize', resizeCanvas);
-    resizeCanvas(); // Initial call
+    resizeCanvas();
 
     function drawGame() {
-      if (isPaused) return; // Stop drawing when the game is paused
+      if (isPaused) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw the snake
       snake.forEach((segment, index) => {
-        ctx.fillStyle = index === 0 ? '#0f0' : '#00f'; // Head is green, body is blue
+        ctx.fillStyle = index === 0 ? '#0f0' : '#00f';
         ctx.fillRect(segment.x, segment.y, boxSize, boxSize);
       });
 
-      // Draw the food
       ctx.fillStyle = 'red';
       ctx.fillRect(food.x, food.y, boxSize, boxSize);
 
-      // Draw obstacles
       ctx.fillStyle = 'gray';
       maps[currentMap].obstacles.forEach(obstacle => {
         ctx.fillRect(obstacle.x, obstacle.y, boxSize, boxSize);
@@ -125,7 +104,7 @@
 
       moveSnake();
       checkCollisions();
-      gameInterval = setTimeout(drawGame, speed); // Smooth refresh rate
+      gameInterval = setTimeout(drawGame, speed);
     }
 
     function moveSnake() {
@@ -136,7 +115,6 @@
       if (direction === 'LEFT') head.x -= boxSize;
       if (direction === 'RIGHT') head.x += boxSize;
 
-      // Wrap around if the head goes outside the boundaries
       if (head.x < 0) head.x = canvas.width - boxSize;
       if (head.x >= canvas.width) head.x = 0;
       if (head.y < 0) head.y = canvas.height - boxSize;
@@ -148,10 +126,9 @@
         score += 10;
         currentScoreEl.textContent = score;
 
-        // Level up logic
         if (score >= level * 50) {
           level++;
-          speed = Math.max(minSpeed, speed - 10); // Gradually reduce speed but not below minSpeed
+          speed = Math.max(minSpeed, speed - 10);
         }
 
         food = generateFood();
@@ -163,14 +140,12 @@
     function checkCollisions() {
       const head = snake[0];
 
-      // Check for self-collision
       for (let i = 1; i < snake.length; i++) {
         if (head.x === snake[i].x && head.y === snake[i].y) {
           gameOver();
         }
       }
 
-      // Check for collision with obstacles
       for (let obstacle of maps[currentMap].obstacles) {
         if (head.x === obstacle.x && head.y === obstacle.y) {
           gameOver();
@@ -188,7 +163,7 @@
       score = 0;
       currentScoreEl.textContent = score;
       level = 1;
-      speed = 150; // Reset speed
+      speed = 150;
       snake = [{ x: 200, y: 200 }];
       direction = 'RIGHT';
       food = generateFood();
@@ -196,10 +171,23 @@
     }
 
     function generateFood() {
-      return {
-        x: Math.floor((Math.random() * canvas.width) / boxSize) * boxSize,
-        y: Math.floor((Math.random() * canvas.height) / boxSize) * boxSize,
-      };
+      let foodPosition;
+      do {
+        foodPosition = {
+          x: Math.floor((Math.random() * canvas.width) / boxSize) * boxSize,
+          y: Math.floor((Math.random() * canvas.height) / boxSize) * boxSize,
+        };
+      } while (isFoodOnSnake(foodPosition) || isFoodOnObstacle(foodPosition));
+
+      return foodPosition;
+    }
+
+    function isFoodOnSnake(position) {
+      return snake.some(segment => segment.x === position.x && segment.y === position.y);
+    }
+
+    function isFoodOnObstacle(position) {
+      return maps[currentMap].obstacles.some(obstacle => obstacle.x === position.x && obstacle.y === position.y);
     }
 
     document.addEventListener('keydown', (e) => {
@@ -209,11 +197,10 @@
       if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
     });
 
-    // Add event listeners for buttons
     pauseResumeBtn.addEventListener('click', () => {
       if (isPaused) {
         isPaused = false;
-        drawGame(); // Resume the game
+        drawGame();
       } else {
         isPaused = true;
         clearTimeout(gameInterval);
@@ -222,24 +209,9 @@
 
     restartBtn.addEventListener('click', () => {
       gameOver();
-      drawGame(); // Start a new game
+      drawGame();
     });
 
-    // Add event listeners for arrow buttons
-    document.getElementById('up-btn').addEventListener('click', () => {
-      if (direction !== 'DOWN') direction = 'UP';
-    });
-    document.getElementById('down-btn').addEventListener('click', () => {
-      if (direction !== 'UP') direction = 'DOWN';
-    });
-    document.getElementById('left-btn').addEventListener('click', () => {
-      if (direction !== 'RIGHT') direction = 'LEFT';
-    });
-    document.getElementById('right-btn').addEventListener('click', () => {
-      if (direction !== 'LEFT') direction = 'RIGHT';
-    });
-
-    // Start the game loop
     drawGame();
   </script>
 </body>
