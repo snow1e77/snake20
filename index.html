@@ -28,15 +28,22 @@
     }
     .controls {
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
       width: 100%;
       margin-top: 10px;
     }
-    button {
-      margin: 5px;
+    .pause-btn {
+      margin: 10px;
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    .pause-btn:hover {
+      background-color: #d32f2f;
     }
   </style>
 </head>
@@ -47,10 +54,7 @@
   </div>
   <canvas id="gameCanvas"></canvas>
   <div class="controls">
-    <button onclick="changeDirection('UP')">↑</button>
-    <button onclick="changeDirection('LEFT')">←</button>
-    <button onclick="changeDirection('RIGHT')">→</button>
-    <button onclick="changeDirection('DOWN')">↓</button>
+    <button class="pause-btn" id="pause-resume-btn">Pause</button>
   </div>
 
   <script>
@@ -59,7 +63,6 @@
     const currentScoreEl = document.getElementById('current-score');
     const highScoreEl = document.getElementById('high-score');
     const pauseResumeBtn = document.getElementById('pause-resume-btn');
-    const restartBtn = document.getElementById('restart-btn');
 
     const boxSize = 20;
     let speed = 150;
@@ -76,8 +79,8 @@
     let gameInterval;
 
     function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight * 0.8; // 80% of the window height
+      canvas.width = window.innerWidth < 400 ? 400 : window.innerWidth * 0.8;
+      canvas.height = window.innerHeight < 400 ? 400 : window.innerHeight * 0.8;
       drawGame();
     }
 
@@ -91,6 +94,11 @@
       snake.forEach((segment, index) => {
         ctx.fillStyle = index === 0 ? '#0f0' : '#00f';
         ctx.fillRect(segment.x, segment.y, boxSize, boxSize);
+        if (index === 0) {
+          ctx.strokeStyle = 'white';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(segment.x, segment.y, boxSize, boxSize);
+        }
       });
 
       ctx.fillStyle = 'red';
@@ -197,11 +205,6 @@
         isPaused = true;
         clearTimeout(gameInterval);
       }
-    });
-
-    restartBtn.addEventListener('click', () => {
-      gameOver();
-      drawGame();
     });
 
     drawGame();
