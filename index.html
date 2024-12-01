@@ -43,30 +43,25 @@
     const currentScoreEl = document.getElementById('current-score');
     const highScoreEl = document.getElementById('high-score');
 
-    // Игровые настройки
-    const boxSize = 20; // Размер клетки
-    let speed = 100; // Скорость игры
+    const boxSize = 20;
+    let speed = 100;
     let score = 0;
     let highScore = localStorage.getItem('highScore') || 0;
     highScoreEl.textContent = highScore;
 
-    // Змейка и еда
     let snake = [{ x: 200, y: 200 }];
     let direction = 'RIGHT';
     let food = generateFood();
 
-    // Рендеринг игры
     function drawGame() {
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Рисуем змейку
       snake.forEach((segment, index) => {
-        ctx.fillStyle = index === 0 ? '#0f0' : '#00f'; // Голова зелёная, тело синее
+        ctx.fillStyle = index === 0 ? '#0f0' : '#00f';
         ctx.fillRect(segment.x, segment.y, boxSize, boxSize);
       });
 
-      // Рисуем еду
       ctx.fillStyle = 'red';
       ctx.fillRect(food.x, food.y, boxSize, boxSize);
 
@@ -74,7 +69,6 @@
       checkCollisions();
     }
 
-    // Движение змейки
     function moveSnake() {
       const head = { ...snake[0] };
 
@@ -85,12 +79,11 @@
 
       snake.unshift(head);
 
-      // Проверка на поедание еды
       if (head.x === food.x && head.y === food.y) {
         score += 10;
         currentScoreEl.textContent = score;
         food = generateFood();
-        speed = Math.max(50, speed - 5); // Увеличение скорости
+        speed = Math.max(50, speed - 5);
         clearInterval(gameInterval);
         gameInterval = setInterval(drawGame, speed);
       } else {
@@ -98,31 +91,28 @@
       }
     }
 
-   // Проверка столкновений (обновлено)
-function checkCollisions() {
-  const head = snake[0];
+    function checkCollisions() {
+      const head = snake[0];
 
-  // Телепортация змейки через противоположные границы
-  if (head.x < 0) {
-    head.x = canvas.width - boxSize;
-  } else if (head.x >= canvas.width) {
-    head.x = 0;
-  }
-  if (head.y < 0) {
-    head.y = canvas.height - boxSize;
-  } else if (head.y >= canvas.height) {
-    head.y = 0;
-  }
+      // Переход через границы
+      if (head.x < 0) {
+        head.x = canvas.width - boxSize;
+      } else if (head.x >= canvas.width) {
+        head.x = 0;
+      }
+      if (head.y < 0) {
+        head.y = canvas.height - boxSize;
+      } else if (head.y >= canvas.height) {
+        head.y = 0;
+      }
 
-  // Столкновение с собой
-  for (let i = 1; i < snake.length; i++) {
-    if (head.x === snake[i].x && head.y === snake[i].y) {
-      gameOver();
+      for (let i = 1; i < snake.length; i++) {
+        if (head.x === snake[i].x && head.y === snake[i].y) {
+          gameOver();
+        }
+      }
     }
-  }
-}
 
-    // Конец игры
     function gameOver() {
       alert('Game Over! Your score: ' + score);
       if (score > highScore) {
@@ -140,7 +130,6 @@ function checkCollisions() {
       gameInterval = setInterval(drawGame, speed);
     }
 
-    // Генерация еды
     function generateFood() {
       return {
         x: Math.floor((Math.random() * canvas.width) / boxSize) * boxSize,
@@ -148,7 +137,6 @@ function checkCollisions() {
       };
     }
 
-    // Управление змейкой
     document.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
       if (e.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
@@ -156,7 +144,6 @@ function checkCollisions() {
       if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
     });
 
-    // Запуск игры
     let gameInterval = setInterval(drawGame, speed);
   </script>
 </body>
