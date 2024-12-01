@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 2px solid #000;
+            background-color: #fff;
+        }
+        .controls {
+            display: flex;
+            margin-top: 10px;
+        }
+        .controls button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+        .share-btn {
+            display: none;
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .share-btn:hover {
+            background-color: #005a9e;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="controls">
+        <button id="up">⬆️</button>
+        <button id="left">⬅️</button>
+        <button id="right">➡️</button>
+        <button id="down">⬇️</button>
+    </div>
+    <button id="shareBtn" class="share-btn">Поделиться результатом</button>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const shareBtn = document.getElementById('shareBtn');
+
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+
+        let snake = [{ x: 5, y: 5 }];
+        let food = { x: 10, y: 10 };
+        let direction = { x: 0, y: 0 };
+        let score = 0;
+
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Разворачиваем Web App на полный экран
+
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw snake
+            ctx.fillStyle = 'green';
+            snake.forEach(segment => {
+                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+            });
+
+            // Draw food
+            ctx.fillStyle = 'red';
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+
+            // Move snake
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+            snake.unshift(head);
+
+            // Check for food collision
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                food = { x: Math.floor(Math.random() * tileCount), y: Math.floor(Math.random() * tileCount) };
+            } else {
+                snake.pop();
+            }
+
+            // Check for wall collision
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                gameOver();
+            }
+
+            // Check for self collision
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    gameOver();
+                }
+            }
+
+            setTimeout(drawGame, 100);
+        }
+
+        function gameOver() {
+            alert(`Игра окончена! Ваш результат: ${score} очков.`);
+            // Отправляем данные в Telegram
+            tg.sendData(JSON.stringify({ score }));
+            // Показываем кнопку "Поделиться результатом"
+            shareBtn.style.display = 'block';
+
+            // Сбрасываем игру
+            snake = [{ x: 5, y: 5 }];
+            direction = { x: 0, y: 0 };
+            score = 0;
+        }
+
+        shareBtn.onclick = () => {
+            tg.showPopup({
+                message: `Мой результат: ${score} очков!`,
+                buttons: [{ text: "Закрыть", type: "close" }],
+            });
+        };
+
+        document.getElementById('up').onclick = () => direction = { x: 0, y: -1 };
+        document.getElementById('down').onclick = () => direction = { x: 0, y: 1 };
+        document.getElementById('left').onclick = () => direction = { x: -1, y: 0 };
+        document.getElementById('right').onclick = () => direction = { x: 1, y: 0 };
+
+        drawGame();
+    </script>
+</body>
+</html>
