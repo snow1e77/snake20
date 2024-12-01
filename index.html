@@ -54,6 +54,8 @@
     let snake = [{ x: 200, y: 200 }];
     let direction = 'RIGHT';
     let food = generateFood();
+    let isPaused = false; // Flag to check if the game is paused
+    let gameInterval;
 
     // Array of maps with different obstacle configurations
     const maps = [
@@ -64,6 +66,7 @@
     let currentMap = 0; // Starting map
 
     function drawGame() {
+      if (isPaused) return; // Stop drawing when the game is paused
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Draw the snake
@@ -84,7 +87,7 @@
 
       moveSnake();
       checkCollisions();
-      setTimeout(drawGame, speed); // Smooth refresh rate
+      gameInterval = setTimeout(drawGame, speed); // Smooth refresh rate
     }
 
     function moveSnake() {
@@ -151,6 +154,7 @@
       snake = [{ x: 200, y: 200 }];
       direction = 'RIGHT';
       food = generateFood();
+      clearTimeout(gameInterval);
     }
 
     function generateFood() {
@@ -165,6 +169,23 @@
       if (e.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
       if (e.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
       if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+
+      // Pause/Resume logic
+      if (e.key === 'p' || e.key === 'P') {
+        if (isPaused) {
+          isPaused = false;
+          drawGame(); // Resume the game
+        } else {
+          isPaused = true;
+          clearTimeout(gameInterval);
+        }
+      }
+
+      // Restart logic
+      if (e.key === 'r' || e.key === 'R') {
+        gameOver();
+        drawGame(); // Start a new game
+      }
     });
 
     // Start the game loop
