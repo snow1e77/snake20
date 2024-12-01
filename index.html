@@ -18,14 +18,18 @@
     }
     canvas {
       border: 2px solid white;
-      max-width: 100%;
+      width: 100%;
       height: auto;
+      touch-action: none; /* Prevents scrolling */
     }
     .score-board {
       text-align: center;
       margin-bottom: 10px;
     }
     .controls {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
       margin-top: 10px;
     }
     button {
@@ -43,8 +47,10 @@
   </div>
   <canvas id="gameCanvas"></canvas>
   <div class="controls">
-    <button id="pause-resume-btn">Pause</button>
-    <button id="restart-btn">Restart</button>
+    <button onclick="changeDirection('UP')">↑</button>
+    <button onclick="changeDirection('LEFT')">←</button>
+    <button onclick="changeDirection('RIGHT')">→</button>
+    <button onclick="changeDirection('DOWN')">↓</button>
   </div>
 
   <script>
@@ -70,8 +76,8 @@
     let gameInterval;
 
     function resizeCanvas() {
-      canvas.width = window.innerWidth < 400 ? 400 : window.innerWidth * 0.8;
-      canvas.height = window.innerHeight < 400 ? 400 : window.innerHeight * 0.8;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight * 0.8; // 80% of the window height
       drawGame();
     }
 
@@ -134,8 +140,6 @@
           gameOver();
         }
       }
-
-      // Check if the head collides with any obstacles (optional)
     }
 
     function gameOver() {
@@ -169,6 +173,13 @@
 
     function isFoodOnSnake(position) {
       return snake.some(segment => segment.x === position.x && segment.y === position.y);
+    }
+
+    function changeDirection(newDirection) {
+      if (newDirection === 'UP' && direction !== 'DOWN') direction = 'UP';
+      if (newDirection === 'DOWN' && direction !== 'UP') direction = 'DOWN';
+      if (newDirection === 'LEFT' && direction !== 'RIGHT') direction = 'LEFT';
+      if (newDirection === 'RIGHT' && direction !== 'LEFT') direction = 'RIGHT';
     }
 
     document.addEventListener('keydown', (e) => {
