@@ -1,140 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-        canvas {
-            border: 2px solid #000;
-            background-color: #fff;
-        }
-        .controls {
-            display: flex;
-            margin-top: 10px;
-        }
-        .controls button {
-            padding: 10px;
-            margin: 5px;
-            font-size: 16px;
-        }
-        .share-btn {
-            display: none;
-            margin-top: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #0078d7;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .share-btn:hover {
-            background-color: #005a9e;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: #333;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+    canvas {
+      border: 2px solid white;
+    }
+    .score-board {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+    }
+    .score-board div {
+      margin: 5px 0;
+    }
+  </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <div class="controls">
-        <button id="up">⬆️</button>
-        <button id="left">⬅️</button>
-        <button id="right">➡️</button>
-        <button id="down">⬇️</button>
-    </div>
-    <button id="shareBtn" class="share-btn">Поделиться результатом</button>
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const shareBtn = document.getElementById('shareBtn');
+  <div class="score-board">
+    <div>Score: <span id="current-score">0</span></div>
+    <div>High Score: <span id="high-score">0</span></div>
+  </div>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
 
-        const gridSize = 20;
-        const tileCount = canvas.width / gridSize;
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const currentScoreEl = document.getElementById('current-score');
+    const highScoreEl = document.getElementById('high-score');
 
-        let snake = [{ x: 5, y: 5 }];
-        let food = { x: 10, y: 10 };
-        let direction = { x: 0, y: 0 };
-        let score = 0;
+    // Игровые настройки
+    const boxSize = 20; // Размер клетки
+    let speed = 100; // Скорость игры
+    let score = 0;
+    let highScore = localStorage.getItem('highScore') || 0;
+    highScoreEl.textContent = highScore;
 
-        // Инициализация Telegram WebApp
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // Разворачиваем Web App на полный экран
+    // Змейка и еда
+    let snake = [{ x: 200, y: 200 }];
+    let direction = 'RIGHT';
+    let food = generateFood();
 
-        function drawGame() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Рендеринг игры
+    function drawGame() {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw snake
-            ctx.fillStyle = 'green';
-            snake.forEach(segment => {
-                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-            });
+      // Рисуем змейку
+      snake.forEach((segment, index) => {
+        ctx.fillStyle = index === 0 ? '#0f0' : '#00f'; // Голова зелёная, тело синее
+        ctx.fillRect(segment.x, segment.y, boxSize, boxSize);
+      });
 
-            // Draw food
-            ctx.fillStyle = 'red';
-            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+      // Рисуем еду
+      ctx.fillStyle = 'red';
+      ctx.fillRect(food.x, food.y, boxSize, boxSize);
 
-            // Move snake
-            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-            snake.unshift(head);
+      moveSnake();
+      checkCollisions();
+    }
 
-            // Check for food collision
-            if (head.x === food.x && head.y === food.y) {
-                score++;
-                food = { x: Math.floor(Math.random() * tileCount), y: Math.floor(Math.random() * tileCount) };
-            } else {
-                snake.pop();
-            }
+    // Движение змейки
+    function moveSnake() {
+      const head = { ...snake[0] };
 
-            // Check for wall collision
-            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
-                gameOver();
-            }
+      if (direction === 'UP') head.y -= boxSize;
+      if (direction === 'DOWN') head.y += boxSize;
+      if (direction === 'LEFT') head.x -= boxSize;
+      if (direction === 'RIGHT') head.x += boxSize;
 
-            // Check for self collision
-            for (let i = 1; i < snake.length; i++) {
-                if (head.x === snake[i].x && head.y === snake[i].y) {
-                    gameOver();
-                }
-            }
+      snake.unshift(head);
 
-            setTimeout(drawGame, 100);
+      // Проверка на поедание еды
+      if (head.x === food.x && head.y === food.y) {
+        score += 10;
+        currentScoreEl.textContent = score;
+        food = generateFood();
+        speed = Math.max(50, speed - 5); // Увеличение скорости
+        clearInterval(gameInterval);
+        gameInterval = setInterval(drawGame, speed);
+      } else {
+        snake.pop();
+      }
+    }
+
+    // Проверка на столкновения
+    function checkCollisions() {
+      const head = snake[0];
+
+      // Столкновение с границами
+      if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+        gameOver();
+      }
+
+      // Столкновение с собой
+      for (let i = 1; i < snake.length; i++) {
+        if (head.x === snake[i].x && head.y === snake[i].y) {
+          gameOver();
         }
+      }
+    }
 
-        function gameOver() {
-            alert(`Игра окончена! Ваш результат: ${score} очков.`);
-            // Отправляем данные в Telegram
-            tg.sendData(JSON.stringify({ score }));
-            // Показываем кнопку "Поделиться результатом"
-            shareBtn.style.display = 'block';
+    // Конец игры
+    function gameOver() {
+      alert('Game Over! Your score: ' + score);
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('highScore', highScore);
+        highScoreEl.textContent = highScore;
+      }
+      score = 0;
+      currentScoreEl.textContent = score;
+      speed = 100;
+      snake = [{ x: 200, y: 200 }];
+      direction = 'RIGHT';
+      food = generateFood();
+      clearInterval(gameInterval);
+      gameInterval = setInterval(drawGame, speed);
+    }
 
-            // Сбрасываем игру
-            snake = [{ x: 5, y: 5 }];
-            direction = { x: 0, y: 0 };
-            score = 0;
-        }
+    // Генерация еды
+    function generateFood() {
+      return {
+        x: Math.floor((Math.random() * canvas.width) / boxSize) * boxSize,
+        y: Math.floor((Math.random() * canvas.height) / boxSize) * boxSize,
+      };
+    }
 
-        shareBtn.onclick = () => {
-            tg.showPopup({
-                message: `Мой результат: ${score} очков!`,
-                buttons: [{ text: "Закрыть", type: "close" }],
-            });
-        };
+    // Управление змейкой
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
+      if (e.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+      if (e.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
+      if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+    });
 
-        document.getElementById('up').onclick = () => direction = { x: 0, y: -1 };
-        document.getElementById('down').onclick = () => direction = { x: 0, y: 1 };
-        document.getElementById('left').onclick = () => direction = { x: -1, y: 0 };
-        document.getElementById('right').onclick = () => direction = { x: 1, y: 0 };
-
-        drawGame();
-    </script>
+    // Запуск игры
+    let gameInterval = setInterval(drawGame, speed);
+  </script>
 </body>
 </html>
