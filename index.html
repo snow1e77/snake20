@@ -20,7 +20,8 @@
       border: 2px solid white;
       width: 100%;
       height: auto;
-      touch-action: none; /* Prevents scrolling */
+      max-width: 600px;
+      touch-action: none;
     }
     .score-board {
       text-align: center;
@@ -32,7 +33,7 @@
       width: 100%;
       margin-top: 10px;
     }
-    .pause-btn {
+    .pause-btn, .restart-btn {
       margin: 10px;
       padding: 10px 20px;
       font-size: 16px;
@@ -42,7 +43,7 @@
       border: none;
       border-radius: 5px;
     }
-    .pause-btn:hover {
+    .pause-btn:hover, .restart-btn:hover {
       background-color: #d32f2f;
     }
   </style>
@@ -55,6 +56,7 @@
   <canvas id="gameCanvas"></canvas>
   <div class="controls">
     <button class="pause-btn" id="pause-resume-btn">Pause</button>
+    <button class="restart-btn" id="restart-btn">Restart</button>
   </div>
 
   <script>
@@ -63,6 +65,7 @@
     const currentScoreEl = document.getElementById('current-score');
     const highScoreEl = document.getElementById('high-score');
     const pauseResumeBtn = document.getElementById('pause-resume-btn');
+    const restartBtn = document.getElementById('restart-btn');
 
     const boxSize = 20;
     let speed = 150;
@@ -183,13 +186,6 @@
       return snake.some(segment => segment.x === position.x && segment.y === position.y);
     }
 
-    function changeDirection(newDirection) {
-      if (newDirection === 'UP' && direction !== 'DOWN') direction = 'UP';
-      if (newDirection === 'DOWN' && direction !== 'UP') direction = 'DOWN';
-      if (newDirection === 'LEFT' && direction !== 'RIGHT') direction = 'LEFT';
-      if (newDirection === 'RIGHT' && direction !== 'LEFT') direction = 'RIGHT';
-    }
-
     document.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
       if (e.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
@@ -205,6 +201,18 @@
         isPaused = true;
         clearTimeout(gameInterval);
       }
+    });
+
+    restartBtn.addEventListener('click', () => {
+      score = 0;
+      currentScoreEl.textContent = score;
+      level = 1;
+      speed = 150;
+      snake = [{ x: 200, y: 200 }];
+      direction = 'RIGHT';
+      food = generateFood();
+      isPaused = false;
+      drawGame();
     });
 
     drawGame();
