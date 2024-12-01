@@ -79,6 +79,7 @@
     function resizeCanvas() {
       canvas.width = window.innerWidth < 400 ? 400 : window.innerWidth * 0.8;
       canvas.height = window.innerHeight < 400 ? 400 : window.innerHeight * 0.8;
+      console.log('Canvas resized:', canvas.width, canvas.height);
       drawGame();
     }
 
