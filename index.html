@@ -44,18 +44,10 @@
     const highScoreEl = document.getElementById('high-score');
 
     const boxSize = 20;
-let speed = 150; // Начальная скорость, более низкая, чтобы игра не начиналась слишком быстро
-const minSpeed = 50; // Минимальная скорость, чтобы игра не была слишком быстрой
-
-// Изменяем увеличение скорости при наборе очков
-if (score >= level * 50) {
-  level++;
-  speed = Math.max(minSpeed, speed - 10); // Плавное уменьшение скорости, с ограничением минимальной скорости
-  clearInterval(gameInterval);
-  gameInterval = setInterval(drawGame, speed);
-}
+    let speed = 150; // Начальная скорость
+    const minSpeed = 50; // Минимальная скорость
     let score = 0;
-    let level = 1; // Новый уровень
+    let level = 1; // Уровень
     let highScore = localStorage.getItem('highScore') || 0;
     highScoreEl.textContent = highScore;
 
@@ -118,7 +110,7 @@ if (score >= level * 50) {
         // Проверка перехода на следующий уровень
         if (score >= level * 50) {
           level++;
-          speed = Math.max(50, speed - 10); // Увеличиваем скорость игры
+          speed = Math.max(minSpeed, speed - 10); // Плавное уменьшение скорости
           clearInterval(gameInterval);
           gameInterval = setInterval(drawGame, speed);
         }
@@ -157,7 +149,7 @@ if (score >= level * 50) {
       score = 0;
       currentScoreEl.textContent = score;
       level = 1;
-      speed = 100;
+      speed = 150; // Сброс скорости
       snake = [{ x: 200, y: 200 }];
       direction = 'RIGHT';
       food = generateFood();
