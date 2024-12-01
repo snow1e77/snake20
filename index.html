@@ -44,7 +44,16 @@
     const highScoreEl = document.getElementById('high-score');
 
     const boxSize = 20;
-    let speed = 100;
+let speed = 150; // Начальная скорость, более низкая, чтобы игра не начиналась слишком быстро
+const minSpeed = 50; // Минимальная скорость, чтобы игра не была слишком быстрой
+
+// Изменяем увеличение скорости при наборе очков
+if (score >= level * 50) {
+  level++;
+  speed = Math.max(minSpeed, speed - 10); // Плавное уменьшение скорости, с ограничением минимальной скорости
+  clearInterval(gameInterval);
+  gameInterval = setInterval(drawGame, speed);
+}
     let score = 0;
     let level = 1; // Новый уровень
     let highScore = localStorage.getItem('highScore') || 0;
