@@ -69,17 +69,9 @@
     let isPaused = false;
     let gameInterval;
 
-    const maps = [
-      { obstacles: [] },
-      { obstacles: [{ x: 100, y: 100 }, { x: 200, y: 200 }] },
-      { obstacles: [{ x: 50, y: 50 }, { x: 150, y: 150 }, { x: 300, y: 300 }] }
-    ];
-    let currentMap = 0;
-
     function resizeCanvas() {
       canvas.width = window.innerWidth < 400 ? 400 : window.innerWidth * 0.8;
       canvas.height = window.innerHeight < 400 ? 400 : window.innerHeight * 0.8;
-      console.log('Canvas resized:', canvas.width, canvas.height);
       drawGame();
     }
 
@@ -98,11 +90,6 @@
       ctx.fillStyle = 'red';
       ctx.fillRect(food.x, food.y, boxSize, boxSize);
 
-      ctx.fillStyle = 'gray';
-      maps[currentMap].obstacles.forEach(obstacle => {
-        ctx.fillRect(obstacle.x, obstacle.y, boxSize, boxSize);
-      });
-
       moveSnake();
       checkCollisions();
       gameInterval = setTimeout(drawGame, speed);
@@ -116,6 +103,7 @@
       if (direction === 'LEFT') head.x -= boxSize;
       if (direction === 'RIGHT') head.x += boxSize;
 
+      // Wrap around logic
       if (head.x < 0) head.x = canvas.width - boxSize;
       if (head.x >= canvas.width) head.x = 0;
       if (head.y < 0) head.y = canvas.height - boxSize;
@@ -147,11 +135,7 @@
         }
       }
 
-      for (let obstacle of maps[currentMap].obstacles) {
-        if (head.x === obstacle.x && head.y === obstacle.y) {
-          gameOver();
-        }
-      }
+      // Check if the head collides with any obstacles (optional)
     }
 
     function gameOver() {
@@ -178,17 +162,13 @@
           x: Math.floor((Math.random() * canvas.width) / boxSize) * boxSize,
           y: Math.floor((Math.random() * canvas.height) / boxSize) * boxSize,
         };
-      } while (isFoodOnSnake(foodPosition) || isFoodOnObstacle(foodPosition));
+      } while (isFoodOnSnake(foodPosition));
 
       return foodPosition;
     }
 
     function isFoodOnSnake(position) {
       return snake.some(segment => segment.x === position.x && segment.y === position.y);
-    }
-
-    function isFoodOnObstacle(position) {
-      return maps[currentMap].obstacles.some(obstacle => obstacle.x === position.x && obstacle.y === position.y);
     }
 
     document.addEventListener('keydown', (e) => {
