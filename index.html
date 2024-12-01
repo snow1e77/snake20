@@ -89,14 +89,17 @@
       if (isPaused) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // Рисуем змейку.
       snake.forEach((segment, index) => {
         ctx.fillStyle = index === 0 ? '#0f0' : '#00f';
         ctx.fillRect(segment.x, segment.y, boxSize, boxSize);
       });
 
+      // Рисуем еду.
       ctx.fillStyle = 'red';
       ctx.fillRect(food.x, food.y, boxSize, boxSize);
 
+      // Рисуем препятствия.
       ctx.fillStyle = 'gray';
       maps[currentMap].obstacles.forEach(obstacle => {
         ctx.fillRect(obstacle.x, obstacle.y, boxSize, boxSize);
@@ -212,7 +215,10 @@
       drawGame();
     });
 
-    drawGame();
+    // Запуск игры после загрузки страницы.
+    window.onload = () => {
+      drawGame();
+    };
   </script>
 </body>
 </html>
