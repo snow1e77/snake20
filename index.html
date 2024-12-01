@@ -57,11 +57,13 @@
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Рисуем змейку
       snake.forEach((segment, index) => {
-        ctx.fillStyle = index === 0 ? '#0f0' : '#00f';
+        ctx.fillStyle = index === 0 ? '#0f0' : '#00f'; // Голова зелёная, тело синее
         ctx.fillRect(segment.x, segment.y, boxSize, boxSize);
       });
 
+      // Рисуем еду
       ctx.fillStyle = 'red';
       ctx.fillRect(food.x, food.y, boxSize, boxSize);
 
@@ -77,13 +79,19 @@
       if (direction === 'LEFT') head.x -= boxSize;
       if (direction === 'RIGHT') head.x += boxSize;
 
+      // Проверка, если голова выходит за границы и телепортируем её на противоположную сторону
+      if (head.x < 0) head.x = canvas.width - boxSize;
+      if (head.x >= canvas.width) head.x = 0;
+      if (head.y < 0) head.y = canvas.height - boxSize;
+      if (head.y >= canvas.height) head.y = 0;
+
       snake.unshift(head);
 
       if (head.x === food.x && head.y === food.y) {
         score += 10;
         currentScoreEl.textContent = score;
         food = generateFood();
-        speed = Math.max(50, speed - 5);
+        speed = Math.max(50, speed - 5); // Увеличиваем скорость при поедании еды
         clearInterval(gameInterval);
         gameInterval = setInterval(drawGame, speed);
       } else {
@@ -94,18 +102,7 @@
     function checkCollisions() {
       const head = snake[0];
 
-      // Переход через границы
-      if (head.x < 0) {
-        head.x = canvas.width - boxSize;
-      } else if (head.x >= canvas.width) {
-        head.x = 0;
-      }
-      if (head.y < 0) {
-        head.y = canvas.height - boxSize;
-      } else if (head.y >= canvas.height) {
-        head.y = 0;
-      }
-
+      // Проверка на столкновение с самим собой
       for (let i = 1; i < snake.length; i++) {
         if (head.x === snake[i].x && head.y === snake[i].y) {
           gameOver();
