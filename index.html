@@ -75,6 +75,16 @@
         .mobile-button:hover {
             background: #666;
         }
+        #gameOver {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            text-shadow: 0 0 10px #fff;
+        }
     </style>
 </head>
 <body>
@@ -82,7 +92,7 @@
         Score: <span id="score">0</span> | Best Score: <span id="bestScore">0</span>
     </div>
     <div id="menu">
-        <h2 style="color: white; text-shadow: 0 0 10px #fff;">Select Difficulty</h2>
+        <h2>Select Difficulty</h2>
         <button onclick="selectDifficulty('easy')">Easy</button>
         <button onclick="selectDifficulty('medium')">Medium</button>
         <button onclick="selectDifficulty('hard')">Hard</button>
@@ -99,6 +109,11 @@
         <button class="mobile-button" onclick="changeDirectionMobile('RIGHT')">➡️</button>
     </div>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div id="gameOver">
+        <h2>Game Over!</h2>
+        <button onclick="restartGame()">New Game</button>
+        <button onclick="exitToMenu()">Main Menu</button>
+    </div>
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -183,9 +198,44 @@
         }
 
         function drawGame() {
-$1clearInterval(game);
-    displayGameOverScreen();
-$2return;
+            if (gamePaused) return;
+
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Move the snake
+            let snakeX = snake[0].x;
+            let snakeY = snake[0].y;
+
+            if (nextDirection === 'UP') snakeY -= boxSize;
+            if (nextDirection === 'DOWN') snakeY += boxSize;
+            if (nextDirection === 'LEFT') snakeX -= boxSize;
+            if (nextDirection === 'RIGHT') snakeX += boxSize;
+
+            // Wrap snake position if it goes out of bounds
+            if (snakeX < 0) {
+                snakeX = canvas.width - boxSize;
+            } else if (snakeX >= canvas.width) {
+                snakeX = 0;
+            }
+
+            if (snakeY < 0) {
+                snakeY = canvas.height - boxSize;
+            } else if (snakeY >= canvas.height) {
+                snakeY = 0;
+            }
+
+            // Check for collisions with itself if snake length is greater than 3
+            if (snake.length > 3 && collision(snakeX, snakeY, snake)) {
+                clearInterval(game);
+                if (score > bestScore) {
+                    bestScore = score;
+                    localStorage.setItem('bestScore', bestScore);
+                    document.getElementById('bestScore').innerText = bestScore;
+                }
+                displayGameOverScreen();
+                return;
             }
 
             // Check if snake eats the food
@@ -266,11 +316,11 @@ $2return;
         }
 
         function displayGameOverScreen() {
-    document.getElementById('controls').style.display = 'none';
-    document.getElementById('gameOver').style.display = 'block';
-}
+            document.getElementById('controls').style.display = 'none';
+            document.getElementById('gameOver').style.display = 'block';
+        }
 
-function pauseGame() {
+        function pauseGame() {
             gamePaused = !gamePaused;
             const menuButton = document.getElementById('menuButton');
             if (!gamePaused) {
@@ -283,8 +333,8 @@ function pauseGame() {
         }
 
         function restartGame() {
-    document.getElementById('gameOver').style.display = 'none';
-$1initializeGame();
+            document.getElementById('gameOver').style.display = 'none';
+            initializeGame();
             gamePaused = false;
             game = setInterval(drawGame, gameSpeed);
         }
@@ -294,14 +344,12 @@ $1initializeGame();
         }
 
         function exitToMenu() {
-    document.getElementById('gameOver').style.display = 'none';
-$1document.getElementById('menu').style.display = 'block';
+            clearInterval(game);
+            document.getElementById('controls').style.display = 'none';
+            document.getElementById('gameOver').style.display = 'none';
+            canvas.style.display = 'none';
+            document.getElementById('menu').style.display = 'block';
         }
     </script>
-    <div id="gameOver" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-        <h2 style="color: white; text-shadow: 0 0 10px #fff;">Game Over!</h2>
-        <button onclick="restartGame()">New Game</button>
-        <button onclick="exitToMenu()">Main Menu</button>
-    </div>
 </body>
 </html>
