@@ -40,14 +40,23 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const boxSize = 20;
-        let snake = [{ x: 8 * boxSize, y: 8 * boxSize }];
-        let direction = 'RIGHT';
-        let food = {
-            x: Math.floor(Math.random() * (canvas.width / boxSize)) * boxSize,
-            y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize
-        };
+        let snake;
+        let direction;
+        let food;
         let game;
         let gamePaused = false;
+
+        function initializeGame() {
+            snake = [{
+                x: Math.floor(Math.random() * (canvas.width / boxSize)) * boxSize,
+                y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize
+            }];
+            direction = 'RIGHT';
+            food = {
+                x: Math.floor(Math.random() * (canvas.width / boxSize)) * boxSize,
+                y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize
+            };
+        }
 
         document.addEventListener('keydown', changeDirection);
 
@@ -145,16 +154,12 @@
 
         function restartGame() {
             clearInterval(game);
-            snake = [{ x: 8 * boxSize, y: 8 * boxSize }];
-            direction = 'RIGHT';
-            food = {
-                x: Math.floor(Math.random() * (canvas.width / boxSize)) * boxSize,
-                y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize
-            };
+            initializeGame();
             gamePaused = false;
             game = setInterval(drawGame, 100);
         }
 
+        initializeGame();
         game = setInterval(drawGame, 100);
     </script>
 </body>
