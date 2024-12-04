@@ -11,12 +11,13 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #000;
+            background: radial-gradient(circle, #282828, #000);
             flex-direction: column;
         }
         canvas {
-            background-color: #333;
+            background: linear-gradient(135deg, #444, #222);
             border: 5px solid #fff;
+            box-shadow: 0 0 20px #fff;
             display: none;
         }
         #controls, #menu {
@@ -32,6 +33,14 @@
             padding: 10px;
             font-size: 16px;
             margin: 5px;
+            border: none;
+            background: #444;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: #666;
         }
         #startButton {
             padding: 15px;
@@ -41,6 +50,7 @@
             color: #fff;
             font-size: 20px;
             margin-bottom: 10px;
+            text-shadow: 0 0 10px #fff;
         }
         #menuButton {
             display: none;
@@ -52,7 +62,7 @@
         Score: <span id="score">0</span> | Best Score: <span id="bestScore">0</span>
     </div>
     <div id="menu">
-        <h2 style="color: white;">Select Difficulty</h2>
+        <h2 style="color: white; text-shadow: 0 0 10px #fff;">Select Difficulty</h2>
         <button onclick="startGame('easy')">Easy</button>
         <button onclick="startGame('medium')">Medium</button>
         <button onclick="startGame('hard')">Hard</button>
@@ -117,14 +127,24 @@
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw the food
-            ctx.fillStyle = 'red';
+            // Draw the food with gradient
+            const foodGradient = ctx.createRadialGradient(food.x + boxSize / 2, food.y + boxSize / 2, 5, food.x + boxSize / 2, food.y + boxSize / 2, boxSize / 2);
+            foodGradient.addColorStop(0, 'yellow');
+            foodGradient.addColorStop(1, 'red');
+            ctx.fillStyle = foodGradient;
             ctx.fillRect(food.x, food.y, boxSize, boxSize);
 
-            // Draw the snake
+            // Draw the snake with gradient
             for (let i = 0; i < snake.length; i++) {
-                ctx.fillStyle = 'lime';
+                const snakeGradient = ctx.createLinearGradient(snake[i].x, snake[i].y, snake[i].x + boxSize, snake[i].y + boxSize);
+                snakeGradient.addColorStop(0, '#32a852');
+                snakeGradient.addColorStop(1, '#1f7a36');
+                ctx.fillStyle = snakeGradient;
                 ctx.fillRect(snake[i].x, snake[i].y, boxSize, boxSize);
+
+                // Add shadow effect to snake
+                ctx.shadowColor = '#000';
+                ctx.shadowBlur = 10;
             }
 
             // Move the snake
