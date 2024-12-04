@@ -50,6 +50,9 @@
     <div id="controls">
         <button onclick="pauseGame()">Pause</button>
         <button onclick="restartGame()">Restart</button>
+        <button onclick="changeDifficulty('easy')">Easy</button>
+        <button onclick="changeDifficulty('medium')">Medium</button>
+        <button onclick="changeDifficulty('hard')">Hard</button>
     </div>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     <script>
@@ -63,6 +66,7 @@
         let gamePaused = false;
         let score = 0;
         let bestScore = localStorage.getItem('bestScore') ? parseInt(localStorage.getItem('bestScore')) : 0;
+        let gameSpeed = 200;
 
         document.getElementById('bestScore').innerText = bestScore;
 
@@ -175,7 +179,7 @@
         function pauseGame() {
             gamePaused = !gamePaused;
             if (!gamePaused) {
-                game = setInterval(drawGame, 100);
+                game = setInterval(drawGame, gameSpeed);
             } else {
                 clearInterval(game);
             }
@@ -185,7 +189,7 @@
             clearInterval(game);
             initializeGame();
             gamePaused = false;
-            game = setInterval(drawGame, 100);
+            game = setInterval(drawGame, gameSpeed);
         }
 
         function startGame() {
@@ -193,7 +197,18 @@
             document.getElementById('controls').style.display = 'block';
             canvas.style.display = 'block';
             initializeGame();
-            game = setInterval(drawGame, 100);
+            game = setInterval(drawGame, gameSpeed);
+        }
+
+        function changeDifficulty(level) {
+            if (level === 'easy') {
+                gameSpeed = 300;
+            } else if (level === 'medium') {
+                gameSpeed = 200;
+            } else if (level === 'hard') {
+                gameSpeed = 100;
+            }
+            restartGame();
         }
     </script>
 </body>
