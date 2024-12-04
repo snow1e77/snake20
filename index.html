@@ -105,6 +105,7 @@
         const boxSize = 20;
         let snake;
         let direction;
+        let nextDirection;
         let food;
         let game;
         let gamePaused = false;
@@ -120,6 +121,7 @@
                 y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize
             }];
             direction = 'RIGHT';
+            nextDirection = direction;
             food = {
                 x: Math.floor(Math.random() * (canvas.width / boxSize)) * boxSize,
                 y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize
@@ -144,60 +146,33 @@
             canvas.style.display = 'block';
             initializeGame();
             game = setInterval(drawGame, gameSpeed);
-            countdown(3);
-        }
-
-        function countdown(seconds) {
-            let countdownElement = document.createElement('div');
-            countdownElement.id = 'countdown';
-            countdownElement.style.position = 'absolute';
-            countdownElement.style.top = '50%';
-            countdownElement.style.left = '50%';
-            countdownElement.style.transform = 'translate(-50%, -50%)';
-            countdownElement.style.fontSize = '48px';
-            countdownElement.style.color = '#fff';
-            countdownElement.style.textShadow = '0 0 10px #fff';
-            document.body.appendChild(countdownElement);
-
-            let currentSeconds = seconds;
-            countdownElement.innerText = currentSeconds;
-
-            let countdownInterval = setInterval(() => {
-                currentSeconds--;
-                if (currentSeconds <= 0) {
-                    clearInterval(countdownInterval);
-                    document.body.removeChild(countdownElement);
-                } else {
-                    countdownElement.innerText = currentSeconds;
-                }
-            }, 1000);
         }
 
         document.addEventListener('keydown', changeDirection);
 
         function changeDirection(event) {
-            if (event.key === 'ArrowUp' && direction !== 'DOWN') {
-                direction = 'UP';
-            } else if (event.key === 'ArrowDown' && direction !== 'UP') {
-                direction = 'DOWN';
-            } else if (event.key === 'ArrowLeft' && direction !== 'RIGHT') {
-                direction = 'LEFT';
-            } else if (event.key === 'ArrowRight' && direction !== 'LEFT') {
-                direction = 'RIGHT';
+            if (event.key === 'ArrowUp' && direction !== 'DOWN' && direction !== 'UP') {
+                nextDirection = 'UP';
+            } else if (event.key === 'ArrowDown' && direction !== 'UP' && direction !== 'DOWN') {
+                nextDirection = 'DOWN';
+            } else if (event.key === 'ArrowLeft' && direction !== 'RIGHT' && direction !== 'LEFT') {
+                nextDirection = 'LEFT';
+            } else if (event.key === 'ArrowRight' && direction !== 'LEFT' && direction !== 'RIGHT') {
+                nextDirection = 'RIGHT';
             } else if (event.key === ' ') {
                 pauseGame();
             }
         }
 
         function changeDirectionMobile(newDirection) {
-            if (newDirection === 'UP' && direction !== 'DOWN') {
-                direction = 'UP';
-            } else if (newDirection === 'DOWN' && direction !== 'UP') {
-                direction = 'DOWN';
-            } else if (newDirection === 'LEFT' && direction !== 'RIGHT') {
-                direction = 'LEFT';
-            } else if (newDirection === 'RIGHT' && direction !== 'LEFT') {
-                direction = 'RIGHT';
+            if (newDirection === 'UP' && direction !== 'DOWN' && direction !== 'UP') {
+                nextDirection = 'UP';
+            } else if (newDirection === 'DOWN' && direction !== 'UP' && direction !== 'DOWN') {
+                nextDirection = 'DOWN';
+            } else if (newDirection === 'LEFT' && direction !== 'RIGHT' && direction !== 'LEFT') {
+                nextDirection = 'LEFT';
+            } else if (newDirection === 'RIGHT' && direction !== 'LEFT' && direction !== 'RIGHT') {
+                nextDirection = 'RIGHT';
             }
         }
 
@@ -215,18 +190,8 @@
             ctx.fillStyle = foodGradient;
             ctx.fillRect(food.x, food.y, boxSize, boxSize);
 
-            // Draw the snake with gradient and animation
-            for (let i = 0; i < snake.length; i++) {
-                const snakeGradient = ctx.createLinearGradient(snake[i].x, snake[i].y, snake[i].x + boxSize, snake[i].y + boxSize);
-                snakeGradient.addColorStop(0, '#32a852');
-                snakeGradient.addColorStop(1, '#1f7a36');
-                ctx.fillStyle = snakeGradient;
-                ctx.fillRect(snake[i].x, snake[i].y, boxSize, boxSize);
-
-                // Add shadow effect to snake
-                ctx.shadowColor = '#000';
-                ctx.shadowBlur = 10;
-            }
+            // Update direction
+            direction = nextDirection;
 
             // Move the snake
             let snakeX = snake[0].x;
@@ -250,8 +215,8 @@
                 snakeY = 0;
             }
 
-            // Check for collisions with itself
-            if (collision(snakeX, snakeY, snake)) {
+            // Check for collisions with itself if snake length is greater than 3
+            if (snake.length > 3 && collision(snakeX, snakeY, snake)) {
                 clearInterval(game);
                 if (score > bestScore) {
                     bestScore = score;
@@ -279,7 +244,7 @@
         }
 
         function collision(x, y, array) {
-            for (let i = 0; i < array.length; i++) {
+            for (let i = 1; i < array.length; i++) {
                 if (array[i].x === x && array[i].y === y) {
                     return true;
                 }
@@ -300,22 +265,19 @@
         }
 
         function restartGame() {
-            clearInterval(game);
-            initializeGame();
-            gamePaused = false;
-            game = setInterval(drawGame, gameSpeed);
-        }
+    clearInterval(game);
+    initializeGame();
+    gamePaused = false;
+    game = setInterval(drawGame, gameSpeed);
+}
 
         function selectDifficulty(level) {
-            startGame(level);
-        }
+    startGame(level);
+}
 
-        function exitToMenu() {
-            clearInterval(game);
-            document.getElementById('controls').style.display = 'none';
-            canvas.style.display = 'none';
-            document.getElementById('menu').style.display = 'block';
-        }
-    </script>
-</body>
-</html>
+function exitToMenu() {
+    clearInterval(game);
+    document.getElementById('controls').style.display = 'none';
+    canvas.style.display = 'none';
+    document.getElementById('menu').style.display = 'block';
+}
