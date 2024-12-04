@@ -145,19 +145,20 @@
             document.getElementById('controls').style.display = 'block';
             canvas.style.display = 'block';
             initializeGame();
+            if (game) clearInterval(game);
             game = setInterval(drawGame, gameSpeed);
         }
 
         document.addEventListener('keydown', changeDirection);
 
         function changeDirection(event) {
-            if (event.key === 'ArrowUp' && direction !== 'DOWN' && direction !== 'UP') {
+            if (event.key === 'ArrowUp' && direction !== 'DOWN' && nextDirection !== 'DOWN') {
                 nextDirection = 'UP';
-            } else if (event.key === 'ArrowDown' && direction !== 'UP' && direction !== 'DOWN') {
+            } else if (event.key === 'ArrowDown' && direction !== 'UP' && nextDirection !== 'UP') {
                 nextDirection = 'DOWN';
-            } else if (event.key === 'ArrowLeft' && direction !== 'RIGHT' && direction !== 'LEFT') {
+            } else if (event.key === 'ArrowLeft' && direction !== 'RIGHT' && nextDirection !== 'RIGHT') {
                 nextDirection = 'LEFT';
-            } else if (event.key === 'ArrowRight' && direction !== 'LEFT' && direction !== 'RIGHT') {
+            } else if (event.key === 'ArrowRight' && direction !== 'LEFT' && nextDirection !== 'LEFT') {
                 nextDirection = 'RIGHT';
             } else if (event.key === ' ') {
                 pauseGame();
@@ -165,13 +166,13 @@
         }
 
         function changeDirectionMobile(newDirection) {
-            if (newDirection === 'UP' && direction !== 'DOWN' && direction !== 'UP') {
+            if (newDirection === 'UP' && direction !== 'DOWN' && nextDirection !== 'DOWN') {
                 nextDirection = 'UP';
-            } else if (newDirection === 'DOWN' && direction !== 'UP' && direction !== 'DOWN') {
+            } else if (newDirection === 'DOWN' && direction !== 'UP' && nextDirection !== 'UP') {
                 nextDirection = 'DOWN';
-            } else if (newDirection === 'LEFT' && direction !== 'RIGHT' && direction !== 'LEFT') {
+            } else if (newDirection === 'LEFT' && direction !== 'RIGHT' && nextDirection !== 'RIGHT') {
                 nextDirection = 'LEFT';
-            } else if (newDirection === 'RIGHT' && direction !== 'LEFT' && direction !== 'RIGHT') {
+            } else if (newDirection === 'RIGHT' && direction !== 'LEFT' && nextDirection !== 'LEFT') {
                 nextDirection = 'RIGHT';
             }
         }
@@ -183,32 +184,14 @@
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw the snake
-            for (let i = 0; i < snake.length; i++) {
-                ctx.fillStyle = i === 0 ? '#32a852' : '#1f7a36';
-                ctx.fillRect(snake[i].x, snake[i].y, boxSize, boxSize);
-                ctx.strokeStyle = '#000';
-                ctx.strokeRect(snake[i].x, snake[i].y, boxSize, boxSize);
-            }
-
-            // Draw the food with gradient animation
-            const foodGradient = ctx.createRadialGradient(food.x + boxSize / 2, food.y + boxSize / 2, 5, food.x + boxSize / 2, food.y + boxSize / 2, boxSize / 2);
-            foodGradient.addColorStop(0, 'yellow');
-            foodGradient.addColorStop(1, 'red');
-            ctx.fillStyle = foodGradient;
-            ctx.fillRect(food.x, food.y, boxSize, boxSize);
-
-            // Update direction
-            direction = nextDirection;
-
             // Move the snake
             let snakeX = snake[0].x;
             let snakeY = snake[0].y;
 
-            if (direction === 'UP') snakeY -= boxSize;
-            if (direction === 'DOWN') snakeY += boxSize;
-            if (direction === 'LEFT') snakeX -= boxSize;
-            if (direction === 'RIGHT') snakeX += boxSize;
+            if (nextDirection === 'UP') snakeY -= boxSize;
+            if (nextDirection === 'DOWN') snakeY += boxSize;
+            if (nextDirection === 'LEFT') snakeX -= boxSize;
+            if (nextDirection === 'RIGHT') snakeX += boxSize;
 
             // Wrap snake position if it goes out of bounds
             if (snakeX < 0) {
@@ -249,6 +232,24 @@
 
             let newHead = { x: snakeX, y: snakeY };
             snake.unshift(newHead);
+
+            // Draw the snake
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = i === 0 ? '#32a852' : '#1f7a36';
+                ctx.fillRect(snake[i].x, snake[i].y, boxSize, boxSize);
+                ctx.strokeStyle = '#000';
+                ctx.strokeRect(snake[i].x, snake[i].y, boxSize, boxSize);
+            }
+
+            // Draw the food with gradient animation
+            const foodGradient = ctx.createRadialGradient(food.x + boxSize / 2, food.y + boxSize / 2, 5, food.x + boxSize / 2, food.y + boxSize / 2, boxSize / 2);
+            foodGradient.addColorStop(0, 'yellow');
+            foodGradient.addColorStop(1, 'red');
+            ctx.fillStyle = foodGradient;
+            ctx.fillRect(food.x, food.y, boxSize, boxSize);
+
+            // Update direction
+            direction = nextDirection;
         }
 
         function collision(x, y, array) {
