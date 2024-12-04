@@ -70,8 +70,21 @@
             if (direction === 'LEFT') snakeX -= boxSize;
             if (direction === 'RIGHT') snakeX += boxSize;
 
-            // Check for collisions
-            if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(snakeX, snakeY, snake)) {
+            // Wrap snake position if it goes out of bounds
+            if (snakeX < 0) {
+                snakeX = canvas.width - boxSize;
+            } else if (snakeX >= canvas.width) {
+                snakeX = 0;
+            }
+
+            if (snakeY < 0) {
+                snakeY = canvas.height - boxSize;
+            } else if (snakeY >= canvas.height) {
+                snakeY = 0;
+            }
+
+            // Check for collisions with itself
+            if (collision(snakeX, snakeY, snake)) {
                 clearInterval(game);
                 alert('Game Over!');
                 return;
