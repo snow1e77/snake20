@@ -110,7 +110,7 @@
         let gamePaused = false;
         let score = 0;
         let bestScore = localStorage.getItem('bestScore') ? parseInt(localStorage.getItem('bestScore')) : 0;
-        let gameSpeed = 200;
+        let gameSpeed = 150;
 
         document.getElementById('bestScore').innerText = bestScore;
 
@@ -143,9 +143,7 @@
             document.getElementById('controls').style.display = 'block';
             canvas.style.display = 'block';
             initializeGame();
-            setTimeout(() => {
-                game = setInterval(drawGame, gameSpeed);
-            }, 3000);
+            game = setInterval(drawGame, gameSpeed);
             countdown(3);
         }
 
