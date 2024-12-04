@@ -265,19 +265,22 @@
         }
 
         function restartGame() {
-    clearInterval(game);
-    initializeGame();
-    gamePaused = false;
-    game = setInterval(drawGame, gameSpeed);
-}
+            clearInterval(game);
+            initializeGame();
+            gamePaused = false;
+            game = setInterval(drawGame, gameSpeed);
+        }
 
         function selectDifficulty(level) {
-    startGame(level);
-}
+            startGame(level);
+        }
 
-function exitToMenu() {
-    clearInterval(game);
-    document.getElementById('controls').style.display = 'none';
-    canvas.style.display = 'none';
-    document.getElementById('menu').style.display = 'block';
-}
+        function exitToMenu() {
+            clearInterval(game);
+            document.getElementById('controls').style.display = 'none';
+            canvas.style.display = 'none';
+            document.getElementById('menu').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
