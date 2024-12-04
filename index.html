@@ -61,19 +61,26 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: space-around;
         }
         .mobile-button {
-            padding: 20px;
-            margin: 10px;
+            padding: 15px;
+            width: 60px;
+            height: 60px;
             background: #444;
             color: #fff;
             border-radius: 50%;
             border: none;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: background 0.3s ease, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
         .mobile-button:hover {
             background: #666;
+            transform: scale(1.1);
         }
         #gameOver {
             display: none;
@@ -103,10 +110,12 @@
         <button id="menuButton" onclick="exitToMenu()">Exit to Menu</button>
     </div>
     <div id="mobileControls">
-        <button class="mobile-button" onclick="changeDirectionMobile('UP')">⬆️</button><br>
-        <button class="mobile-button" onclick="changeDirectionMobile('LEFT')">⬅️</button>
+        <button class="mobile-button" onclick="changeDirectionMobile('UP')">⬆️</button>
+        <div style="display: flex;">
+            <button class="mobile-button" onclick="changeDirectionMobile('LEFT')">⬅️</button>
+            <button class="mobile-button" onclick="changeDirectionMobile('RIGHT')">➡️</button>
+        </div>
         <button class="mobile-button" onclick="changeDirectionMobile('DOWN')">⬇️</button>
-        <button class="mobile-button" onclick="changeDirectionMobile('RIGHT')">➡️</button>
     </div>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     <div id="gameOver">
