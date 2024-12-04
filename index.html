@@ -42,6 +42,9 @@
             font-size: 20px;
             margin-bottom: 10px;
         }
+        #menuButton {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -57,7 +60,7 @@
     <div id="controls">
         <button onclick="pauseGame()">Pause</button>
         <button onclick="restartGame()">Restart</button>
-        <button onclick="exitToMenu()">Exit to Menu</button>
+        <button id="menuButton" onclick="exitToMenu()">Exit to Menu</button>
     </div>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     <script>
@@ -183,11 +186,13 @@
 
         function pauseGame() {
             gamePaused = !gamePaused;
+            const menuButton = document.getElementById('menuButton');
             if (!gamePaused) {
                 game = setInterval(drawGame, gameSpeed);
+                menuButton.style.display = 'none';
             } else {
                 clearInterval(game);
-                showMenuButton();
+                menuButton.style.display = 'block';
             }
         }
 
@@ -218,13 +223,6 @@
             document.getElementById('controls').style.display = 'none';
             canvas.style.display = 'none';
             document.getElementById('menu').style.display = 'block';
-        }
-
-        function showMenuButton() {
-            const exitButton = document.createElement('button');
-            exitButton.innerText = 'Exit to Menu';
-            exitButton.onclick = exitToMenu;
-            document.getElementById('controls').appendChild(exitButton);
         }
     </script>
 </body>
