@@ -55,6 +55,26 @@
         #menuButton {
             display: none;
         }
+        #mobileControls {
+            display: none;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .mobile-button {
+            padding: 20px;
+            margin: 10px;
+            background: #444;
+            color: #fff;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .mobile-button:hover {
+            background: #666;
+        }
     </style>
 </head>
 <body>
@@ -71,6 +91,12 @@
         <button onclick="pauseGame()">Pause</button>
         <button onclick="restartGame()">Restart</button>
         <button id="menuButton" onclick="exitToMenu()">Exit to Menu</button>
+    </div>
+    <div id="mobileControls">
+        <button class="mobile-button" onclick="changeDirectionMobile('UP')">⬆️</button><br>
+        <button class="mobile-button" onclick="changeDirectionMobile('LEFT')">⬅️</button>
+        <button class="mobile-button" onclick="changeDirectionMobile('DOWN')">⬇️</button>
+        <button class="mobile-button" onclick="changeDirectionMobile('RIGHT')">➡️</button>
     </div>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     <script>
@@ -102,6 +128,7 @@
             document.getElementById('score').innerText = score;
             gamePaused = false;
             document.getElementById('menuButton').style.display = 'none';
+            document.getElementById('mobileControls').style.display = 'block';
         }
 
         document.addEventListener('keydown', changeDirection);
@@ -117,6 +144,18 @@
                 direction = 'RIGHT';
             } else if (event.key === ' ') {
                 pauseGame();
+            }
+        }
+
+        function changeDirectionMobile(newDirection) {
+            if (newDirection === 'UP' && direction !== 'DOWN') {
+                direction = 'UP';
+            } else if (newDirection === 'DOWN' && direction !== 'UP') {
+                direction = 'DOWN';
+            } else if (newDirection === 'LEFT' && direction !== 'RIGHT') {
+                direction = 'LEFT';
+            } else if (newDirection === 'RIGHT' && direction !== 'LEFT') {
+                direction = 'RIGHT';
             }
         }
 
