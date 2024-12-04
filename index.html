@@ -243,6 +243,14 @@
                 snake.pop();
             }
 
+            if (bonusFood && snakeX === bonusFood.x && snakeY === bonusFood.y) {
+                score += 5;
+                document.getElementById('score').innerText = score;
+                bonusFood = null;
+                bonusActive = false;
+                clearTimeout(bonusTimer);
+            }
+
             let newHead = { x: snakeX, y: snakeY };
             snake.unshift(newHead);
 
