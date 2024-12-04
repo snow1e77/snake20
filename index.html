@@ -57,10 +57,8 @@
         }
         #mobileControls {
             display: none;
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            position: relative;
+            margin-top: 10px;
             width: 100%;
             max-width: 400px;
             display: flex;
@@ -109,6 +107,7 @@
         <button onclick="restartGame()">Restart</button>
         <button id="menuButton" onclick="exitToMenu()">Exit to Menu</button>
     </div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
     <div id="mobileControls">
         <button class="mobile-button" onclick="changeDirectionMobile('UP')">⬆️</button>
         <div style="display: flex;">
@@ -117,7 +116,6 @@
         </div>
         <button class="mobile-button" onclick="changeDirectionMobile('DOWN')">⬇️</button>
     </div>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
     <div id="gameOver">
         <h2>Game Over!</h2>
         <button onclick="restartGame()">New Game</button>
