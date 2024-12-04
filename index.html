@@ -183,6 +183,14 @@
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Draw the snake
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = i === 0 ? '#32a852' : '#1f7a36';
+                ctx.fillRect(snake[i].x, snake[i].y, boxSize, boxSize);
+                ctx.strokeStyle = '#000';
+                ctx.strokeRect(snake[i].x, snake[i].y, boxSize, boxSize);
+            }
+
             // Draw the food with gradient animation
             const foodGradient = ctx.createRadialGradient(food.x + boxSize / 2, food.y + boxSize / 2, 5, food.x + boxSize / 2, food.y + boxSize / 2, boxSize / 2);
             foodGradient.addColorStop(0, 'yellow');
