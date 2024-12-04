@@ -17,9 +17,24 @@
             background-color: #333;
             border: 5px solid #fff;
         }
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 5px;
+        }
     </style>
 </head>
 <body>
+    <div id="controls">
+        <button onclick="pauseGame()">Pause</button>
+        <button onclick="restartGame()">Restart</button>
+    </div>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -31,6 +46,8 @@
             x: Math.floor(Math.random() * (canvas.width / boxSize)) * boxSize,
             y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize
         };
+        let game;
+        let gamePaused = false;
 
         document.addEventListener('keydown', changeDirection);
 
@@ -43,10 +60,14 @@
                 direction = 'LEFT';
             } else if (event.key === 'ArrowRight' && direction !== 'LEFT') {
                 direction = 'RIGHT';
+            } else if (event.key === ' ') {
+                pauseGame();
             }
         }
 
         function drawGame() {
+            if (gamePaused) return;
+
             // Clear canvas
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -113,7 +134,28 @@
             return false;
         }
 
-        let game = setInterval(drawGame, 100);
+        function pauseGame() {
+            gamePaused = !gamePaused;
+            if (!gamePaused) {
+                game = setInterval(drawGame, 100);
+            } else {
+                clearInterval(game);
+            }
+        }
+
+        function restartGame() {
+            clearInterval(game);
+            snake = [{ x: 8 * boxSize, y: 8 * boxSize }];
+            direction = 'RIGHT';
+            food = {
+                x: Math.floor(Math.random() * (canvas.width / boxSize)) * boxSize,
+                y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize
+            };
+            gamePaused = false;
+            game = setInterval(drawGame, 100);
+        }
+
+        game = setInterval(drawGame, 100);
     </script>
 </body>
 </html>
