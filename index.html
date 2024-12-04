@@ -183,44 +183,9 @@
         }
 
         function drawGame() {
-            if (gamePaused) return;
-
-            // Clear canvas
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Move the snake
-            let snakeX = snake[0].x;
-            let snakeY = snake[0].y;
-
-            if (nextDirection === 'UP') snakeY -= boxSize;
-            if (nextDirection === 'DOWN') snakeY += boxSize;
-            if (nextDirection === 'LEFT') snakeX -= boxSize;
-            if (nextDirection === 'RIGHT') snakeX += boxSize;
-
-            // Wrap snake position if it goes out of bounds
-            if (snakeX < 0) {
-                snakeX = canvas.width - boxSize;
-            } else if (snakeX >= canvas.width) {
-                snakeX = 0;
-            }
-
-            if (snakeY < 0) {
-                snakeY = canvas.height - boxSize;
-            } else if (snakeY >= canvas.height) {
-                snakeY = 0;
-            }
-
-            // Check for collisions with itself if snake length is greater than 3
-            if (snake.length > 3 && collision(snakeX, snakeY, snake)) {
-                clearInterval(game);
-                if (score > bestScore) {
-                    bestScore = score;
-                    localStorage.setItem('bestScore', bestScore);
-                    document.getElementById('bestScore').innerText = bestScore;
-                }
-                alert('Game Over!');
-                return;
+$1clearInterval(game);
+    displayGameOverScreen();
+$2return;
             }
 
             // Check if snake eats the food
@@ -300,7 +265,12 @@
             }, 10000); // Bonus food lasts for 10 seconds
         }
 
-        function pauseGame() {
+        function displayGameOverScreen() {
+    document.getElementById('controls').style.display = 'none';
+    document.getElementById('gameOver').style.display = 'block';
+}
+
+function pauseGame() {
             gamePaused = !gamePaused;
             const menuButton = document.getElementById('menuButton');
             if (!gamePaused) {
@@ -313,8 +283,8 @@
         }
 
         function restartGame() {
-            clearInterval(game);
-            initializeGame();
+    document.getElementById('gameOver').style.display = 'none';
+$1initializeGame();
             gamePaused = false;
             game = setInterval(drawGame, gameSpeed);
         }
@@ -324,11 +294,14 @@
         }
 
         function exitToMenu() {
-            clearInterval(game);
-            document.getElementById('controls').style.display = 'none';
-            canvas.style.display = 'none';
-            document.getElementById('menu').style.display = 'block';
+    document.getElementById('gameOver').style.display = 'none';
+$1document.getElementById('menu').style.display = 'block';
         }
     </script>
+    <div id="gameOver" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+        <h2 style="color: white; text-shadow: 0 0 10px #fff;">Game Over!</h2>
+        <button onclick="restartGame()">New Game</button>
+        <button onclick="exitToMenu()">Main Menu</button>
+    </div>
 </body>
 </html>
