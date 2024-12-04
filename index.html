@@ -83,9 +83,9 @@
     </div>
     <div id="menu">
         <h2 style="color: white; text-shadow: 0 0 10px #fff;">Select Difficulty</h2>
-        <button onclick="startGame('easy')">Easy</button>
-        <button onclick="startGame('medium')">Medium</button>
-        <button onclick="startGame('hard')">Hard</button>
+        <button onclick="selectDifficulty('easy')">Easy</button>
+        <button onclick="selectDifficulty('medium')">Medium</button>
+        <button onclick="selectDifficulty('hard')">Hard</button>
     </div>
     <div id="controls">
         <button onclick="pauseGame()">Pause</button>
@@ -131,6 +131,50 @@
             document.getElementById('mobileControls').style.display = 'block';
         }
 
+        function startGame(level) {
+            if (level === 'easy') {
+                gameSpeed = 300;
+            } else if (level === 'medium') {
+                gameSpeed = 200;
+            } else if (level === 'hard') {
+                gameSpeed = 100;
+            }
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('controls').style.display = 'block';
+            canvas.style.display = 'block';
+            initializeGame();
+            setTimeout(() => {
+                game = setInterval(drawGame, gameSpeed);
+            }, 3000);
+            countdown(3);
+        }
+
+        function countdown(seconds) {
+            let countdownElement = document.createElement('div');
+            countdownElement.id = 'countdown';
+            countdownElement.style.position = 'absolute';
+            countdownElement.style.top = '50%';
+            countdownElement.style.left = '50%';
+            countdownElement.style.transform = 'translate(-50%, -50%)';
+            countdownElement.style.fontSize = '48px';
+            countdownElement.style.color = '#fff';
+            countdownElement.style.textShadow = '0 0 10px #fff';
+            document.body.appendChild(countdownElement);
+
+            let currentSeconds = seconds;
+            countdownElement.innerText = currentSeconds;
+
+            let countdownInterval = setInterval(() => {
+                currentSeconds--;
+                if (currentSeconds <= 0) {
+                    clearInterval(countdownInterval);
+                    document.body.removeChild(countdownElement);
+                } else {
+                    countdownElement.innerText = currentSeconds;
+                }
+            }, 1000);
+        }
+
         document.addEventListener('keydown', changeDirection);
 
         function changeDirection(event) {
@@ -166,14 +210,14 @@
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw the food with gradient
+            // Draw the food with gradient animation
             const foodGradient = ctx.createRadialGradient(food.x + boxSize / 2, food.y + boxSize / 2, 5, food.x + boxSize / 2, food.y + boxSize / 2, boxSize / 2);
             foodGradient.addColorStop(0, 'yellow');
             foodGradient.addColorStop(1, 'red');
             ctx.fillStyle = foodGradient;
             ctx.fillRect(food.x, food.y, boxSize, boxSize);
 
-            // Draw the snake with gradient
+            // Draw the snake with gradient and animation
             for (let i = 0; i < snake.length; i++) {
                 const snakeGradient = ctx.createLinearGradient(snake[i].x, snake[i].y, snake[i].x + boxSize, snake[i].y + boxSize);
                 snakeGradient.addColorStop(0, '#32a852');
@@ -264,19 +308,8 @@
             game = setInterval(drawGame, gameSpeed);
         }
 
-        function startGame(level) {
-            if (level === 'easy') {
-                gameSpeed = 300;
-            } else if (level === 'medium') {
-                gameSpeed = 200;
-            } else if (level === 'hard') {
-                gameSpeed = 100;
-            }
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('controls').style.display = 'block';
-            canvas.style.display = 'block';
-            initializeGame();
-            game = setInterval(drawGame, gameSpeed);
+        function selectDifficulty(level) {
+            startGame(level);
         }
 
         function exitToMenu() {
