@@ -107,11 +107,14 @@
         let direction;
         let nextDirection;
         let food;
+        let bonusFood;
         let game;
         let gamePaused = false;
         let score = 0;
         let bestScore = localStorage.getItem('bestScore') ? parseInt(localStorage.getItem('bestScore')) : 0;
         let gameSpeed = 150;
+        let bonusActive = false;
+        let bonusTimer;
 
         document.getElementById('bestScore').innerText = bestScore;
 
@@ -124,8 +127,10 @@
             nextDirection = direction;
             food = {
                 x: Math.floor(Math.random() * (canvas.width / boxSize)) * boxSize,
-                y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize
+                y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize,
+                type: 'normal'
             };
+            bonusFood = null;
             score = 0;
             document.getElementById('score').innerText = score;
             gamePaused = false;
@@ -220,12 +225,20 @@
 
             // Check if snake eats the food
             if (snakeX === food.x && snakeY === food.y) {
+                if (food.type === 'normal') {
+                    score++;
+                    document.getElementById('score').innerText = score;
+                }
                 food = {
                     x: Math.floor(Math.random() * (canvas.width / boxSize)) * boxSize,
-                    y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize
+                    y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize,
+                    type: 'normal'
                 };
-                score++;
-                document.getElementById('score').innerText = score;
+
+                // Random chance to generate bonus food
+                if (Math.random() < 0.2 && !bonusActive) {
+                    generateBonusFood();
+                }
             } else {
                 snake.pop();
             }
@@ -248,6 +261,12 @@
             ctx.fillStyle = foodGradient;
             ctx.fillRect(food.x, food.y, boxSize, boxSize);
 
+            // Draw bonus food if active
+            if (bonusFood) {
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(bonusFood.x, bonusFood.y, boxSize, boxSize);
+            }
+
             // Update direction
             direction = nextDirection;
         }
@@ -259,6 +278,18 @@
                 }
             }
             return false;
+        }
+
+        function generateBonusFood() {
+            bonusFood = {
+                x: Math.floor(Math.random() * (canvas.width / boxSize)) * boxSize,
+                y: Math.floor(Math.random() * (canvas.height / boxSize)) * boxSize
+            };
+            bonusActive = true;
+            bonusTimer = setTimeout(() => {
+                bonusFood = null;
+                bonusActive = false;
+            }, 10000); // Bonus food lasts for 10 seconds
         }
 
         function pauseGame() {
